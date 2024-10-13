@@ -1,5 +1,4 @@
 [core]
     remote = myremote
 ['remote "myremote"']
-    url = gdrive://1ueCElPNOsaGrOPAkjqNIKmM_AAcGbJlf
-    gdrive_acknowledge_abuse = true
+    url = C:/ДЗ/Python Projects/FINALPROJECT/data_finale
