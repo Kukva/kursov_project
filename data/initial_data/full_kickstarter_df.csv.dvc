@@ -1,0 +1,5 @@
+outs:
+- md5: e475e8a146caf75183a89856fbc03d91
+  size: 148143228
+  hash: md5
+  path: full_kickstarter_df.csv
