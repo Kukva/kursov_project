@@ -7,6 +7,5 @@ class User(Base, table=True):
     username: str = Field(index=True, nullable=False, unique=True)
     password: str = Field(nullable=False)
     email: str = Field(index=True, nullable=False, unique=True)
-    balance: float = Field(default=0.0, nullable=False)
     user_type: str = Field(nullable=False)
     fr_model_type: str = Field(nullable=False)

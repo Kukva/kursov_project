@@ -21,7 +21,6 @@ pandas==2.2.2
 scikit-learn==1.5.1
 uuid==1.30
 dvc==3.51.2
-dvc-s3==3.2.0
 pytest==8.2.2
 pytest-cov==5.0.0
 pytest-env==1.1.3
