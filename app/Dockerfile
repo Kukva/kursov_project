@@ -12,8 +12,8 @@ RUN pip install dvc
 
 EXPOSE 8080
 
-COPY entrypoint.sh /app/entrypoint.sh
+# COPY entrypoint.sh /app/entrypoint.sh
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+# ENTRYPOINT ["/app/entrypoint.sh"]
 
 CMD ["python", "api.py"]

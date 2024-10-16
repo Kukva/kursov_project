@@ -9,6 +9,7 @@ class Prediction(Base, table=True):
     user_id: int = Field(foreign_key="user.id", nullable=False)
     request_data: str = Field(nullable=False)
     prediction: int
+    mark: float
     pred_rate: float
     timestamp: datetime = Field(default_factory=datetime.now,
                                 nullable=False)

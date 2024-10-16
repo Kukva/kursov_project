@@ -21,7 +21,6 @@ def process_request(model, user_id: int, data, session):
     save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], session)
     # print(f"saved predictions")
 
-
 def make_prediction(model, data):
     # print(data)
     # return data
