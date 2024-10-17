@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Выполняем действия только при успешном ответе
                 loginContainer.classList.add('hidden');
                 dashboardContainer.classList.remove('hidden');
-                fetchHistory();
-                startFetchingHistory();
+                // fetchHistory();
+                // startFetchingHistory();
                 // TransactionHistory();
                 // startFetchingTrans()
                 toggleTabs();
@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const queryString = new URLSearchParams(data).toString();
         console.log('query', queryString)
         
-        // console.log(queryString)
         try {
             console.log('Отправлен запрос в ml')
             const response = await fetch(`/ml/process_request/${userId}`, {
@@ -140,10 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+            console.log('Fetch completed');
             const result = await response.json();
             if (response.ok) {
                 alert(`Prediction: ${result.prediction_name}`);
-                fetchHistory();
+                // fetchHistory();
                 document.getElementById('result-content').innerHTML = ` `
                 document.getElementById('result-content').innerHTML = `
                     <p><strong>Prediction:</strong> ${result.prediction === 1 ? "Successful" : "Unsuccessful"}</p>

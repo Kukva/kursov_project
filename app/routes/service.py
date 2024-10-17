@@ -17,6 +17,8 @@ encoder = serpg.load_encoder_rf(settings.ENCODER_RF_PATH)
 model = serpg.load_model(settings.MODEL_PATH)
 mean_cat = serpg.load_mean_dict(settings.ENCODED_CATEGORY_PATH)
 
+service_route = APIRouter(tags=['Service'])
+
 connection_params = pika.ConnectionParameters(
     host=settings.RABBITMQ_HOST,  # Замените на адрес вашего RabbitMQ сервера
     port=int(settings.RABBITMQ_PORT),          # Порт по умолчанию для RabbitMQ
@@ -29,22 +31,20 @@ connection_params = pika.ConnectionParameters(
     blocked_connection_timeout=2
 )
 
-
-service_route = APIRouter(tags=['Service'])
-
 @service_route.post('/process_request/{user_id}', response_model=dict)
-def create_process(user_id: int, dataset: PredictItem):
+async def create_process(user_id: int, dataset: PredictItem):
     # ModelService.process_request(mlservice, user_id, data, session)
+    print("Данные с request загружаются")
     data = dataset.model_dump()
     print('Создается request')
-
+    
     message = {'user_id': user_id, 'data': data}
     req_id = str(uuid.uuid4())
     response_queue = 'response_queue_' + req_id
     connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
     channel.queue_declare(queue=response_queue, exclusive=True)
-
+    print("Дошло до этого этапа когда канал распознан")
     def on_response(ch, method, properties, body):
         if properties.correlation_id == req_id:
             global response

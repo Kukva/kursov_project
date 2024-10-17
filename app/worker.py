@@ -23,7 +23,7 @@ connection_params = pika.ConnectionParameters(
         password=settings.RABBITMQ_DEFAULT_PASS,   # Пароль
     ),
     heartbeat=30,
-    blocked_connection_timeout=2
+    blocked_connection_timeout=4
 )
 
 model_path = settings.MODEL_PATH
@@ -50,22 +50,27 @@ def callback(ch, method, properties, body):
                                     category_mapp=CATEGORY_MAPPINGS)
         print(features)
         print("----------------Данные обработаны и отправлены----------------------")
-        process_response = ModelService.process_request(model,
-                                                        body['user_id'],
-                                                        features,
-                                                        body['data']['project_name'],
-                                                        session)
+        process_response = ModelService.process_request(model,features)
         print("----------------Ответ от модели получен----------------------")
         product_analyse = serpg.product_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
         creator_analyse = serpg.creator_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
-        process_response['recommendations'] = serpg.integrate_analyses(product_analyse, process_response['succ_rate'], creator_analyse, process_response['predict'], mode=MODE, model=MODEL_NAME) 
+        process_response['recommendations'] = serpg.integrate_analyses(product_analyse,
+                                                                       creator_analyse,
+                                                                       process_response['predict'],
+                                                                       process_response['succ_rate'],
+                                                                       mode=MODE,
+                                                                       model=MODEL_NAME) 
         print("----------------Анализ и рекомендации построены----------------------")
-
+        ModelService.save_prediction(body['user_id'],
+                                     features,
+                                     process_response['predict'],
+                                     process_response['succ_rate'],
+                                     body['data']['project_name'],
+                                     process_response['recommendations'],
+                                     session)
+        print("----------------Сохранение рекомендации----------------------")
     # if isinstance(process_response, pd.DataFrame):
     #     process_response = process_response.to_dict(orient='records')
-    # for key in process_response.keys:
-    #     print(type(process_response[key]))
-        # TrService.create_transaction(session, body['user_id'], 10, 'minus')
     print(process_response['recommendations'])
     response_channel = connection.channel()
     response_channel.basic_publish(

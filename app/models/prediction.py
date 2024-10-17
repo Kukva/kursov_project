@@ -12,6 +12,7 @@ class Prediction(Base, table=True):
     request_data: str = Field(nullable=False)
     prediction: int
     pred_rate: float
+    analysis: str
     timestamp: datetime = Field(default_factory=datetime.now,
                                 nullable=False)
     

@@ -3,7 +3,6 @@ import subprocess
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from databases.database import init_db
-from services.user import create_user, get_all_users
 from routes.user import user_route
 from routes.service import service_route
 from fastapi.staticfiles import StaticFiles

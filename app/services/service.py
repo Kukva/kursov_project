@@ -14,35 +14,40 @@ def load_model(model_path: str):
     return model
 
 
-def process_request(model, user_id: int, data, project_name, session) -> dict:
+def process_request(model, data) -> dict:
     data = pd.DataFrame(data)
-    prediction = make_prediction(project_name, model, data)
-    save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], project_name, session)
+    prediction = make_prediction(model, data)
+    # save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], project_name, session)
     return prediction
 
-def make_prediction(project_name, model, data):
-    # print(data)
+def make_prediction(model, data):
+    print(f"Дата в таком формате: {data}")
+    print(type(data))
+    json_result = data.to_json(orient='records')
+    print(type(json_result))
     # return data
     predict = model.predict(data)[0].item()
     succ_rate = model.predict_proba(data)[0][1]
     return {'predict': predict,
             'succ_rate': succ_rate,
-            'data': data.to_json(orient='records')}
+            'data': data}
 
 
 def save_prediction(user_id: int, request_data: pd.DataFrame,
-                    prediction, succ_rate, project_name, session):
+                    prediction: int, succ_rate: float, project_name: str, analysis: str, session):
     print(f'user_id: {user_id},\n' \
       f'request_data: {request_data}, \n' \
       f'prediction: {prediction}, \n' \
-      f'succ_rate: {succ_rate}, \n')
+      f'succ_rate: {succ_rate}, \n' \
+      f'analysis: {analysis}, \n')
     print("Тип:", type(request_data))
     prediction_record = Prediction(
         user_id=user_id,
         project_name=project_name,
-        request_data=request_data.to_json(),
+        request_data=request_data,
         prediction=prediction,
         pred_rate=succ_rate,
+        analysis=analysis,
         timestamp=datetime.now()
     )
     session.add(prediction_record)

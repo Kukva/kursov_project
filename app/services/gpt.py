@@ -168,7 +168,7 @@ def product_analysis(startup_info, mode, model):
 
     return (get_response(analysis_prompt, "Please think and analyze step by step.", model))
 
-def integrate_analyses(product_info, pred_succ, founder_info, prediction, mode, model):
+def integrate_analyses(product_info, founder_info, prediction, pred_succ, mode, model):
     prompt = """
     Imagine you are a top startup consultant. Your task is to provide the founders with specific recommendations based on the analysis of their product and founding team. The goal is to offer detailed and actionable feedback to help them improve their crowdfunding campaign, achieve better positioning, and increase their chances of success in the market. These recommendations should directly address common challenges such as incorrect project positioning, unclear goals, and weak audience engagement.
 
