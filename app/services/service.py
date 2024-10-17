@@ -14,7 +14,7 @@ def load_model(model_path: str):
     return model
 
 
-def process_request(model, user_id: int, data, project_name, session):
+def process_request(model, user_id: int, data, project_name, session) -> dict:
     data = pd.DataFrame(data)
     prediction = make_prediction(project_name, model, data)
     save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], project_name, session)
@@ -23,11 +23,11 @@ def process_request(model, user_id: int, data, project_name, session):
 def make_prediction(project_name, model, data):
     # print(data)
     # return data
-    print(data)
-    print(type(data))
-    return {'predict': model.predict(data)[0].item(),
-            'succ_rate': model.predict_proba(data)[0][1],
-            'data': data}
+    predict = model.predict(data)[0].item()
+    succ_rate = model.predict_proba(data)[0][1]
+    return {'predict': predict,
+            'succ_rate': succ_rate,
+            'data': data.to_json(orient='records')}
 
 
 def save_prediction(user_id: int, request_data: pd.DataFrame,

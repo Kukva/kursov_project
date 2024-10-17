@@ -1,4 +1,5 @@
 # Модели и переменные
+MODE = "simple"
 MODEL_NAME = "gpt-3.5-turbo"
 TRAIN_COLUMNS = [
     'category_target_encoding', 'create_launch', 'launch_deadline', 'goal',

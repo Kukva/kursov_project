@@ -5,11 +5,10 @@ import os
 from dotenv import load_dotenv
 from databases.database import get_session
 from databases.database import get_settings
-from routes.config import MODEL_NAME, MODEL_CONTENT_PREPROC, TRAIN_COLUMNS, CATEGORY_MAPPINGS
+from routes.config import MODE, MODEL_NAME, MODEL_CONTENT_PREPROC, TRAIN_COLUMNS, CATEGORY_MAPPINGS
 from services import service as ModelService
 import services.gpt as serpg
 
-settings = get_settings()
 settings = get_settings()
 encoder = serpg.load_encoder_rf(settings.ENCODER_RF_PATH)
 model = serpg.load_model(settings.MODEL_PATH)
@@ -42,9 +41,8 @@ def callback(ch, method, properties, body):
     # print(body)
     # features = pd.DataFrame([body['data'].dict()])
     with next(get_session()) as session:
-        features = serpg.ready_features(data=body['data'],
+        features, data_prep = serpg.ready_features(data=body['data'],
                                     encoder=encoder, 
-                                    model=model,
                                     category_mean=mean_cat,
                                     model_content=MODEL_CONTENT_PREPROC,
                                     model_name=MODEL_NAME,
@@ -58,7 +56,17 @@ def callback(ch, method, properties, body):
                                                         body['data']['project_name'],
                                                         session)
         print("----------------Ответ от модели получен----------------------")
+        product_analyse = serpg.product_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
+        creator_analyse = serpg.creator_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
+        process_response['recommendations'] = serpg.integrate_analyses(product_analyse, process_response['succ_rate'], creator_analyse, process_response['predict'], mode=MODE, model=MODEL_NAME) 
+        print("----------------Анализ и рекомендации построены----------------------")
+
+    # if isinstance(process_response, pd.DataFrame):
+    #     process_response = process_response.to_dict(orient='records')
+    # for key in process_response.keys:
+    #     print(type(process_response[key]))
         # TrService.create_transaction(session, body['user_id'], 10, 'minus')
+    print(process_response['recommendations'])
     response_channel = connection.channel()
     response_channel.basic_publish(
         exchange='',

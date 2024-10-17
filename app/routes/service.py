@@ -36,7 +36,7 @@ service_route = APIRouter(tags=['Service'])
 def create_process(user_id: int, dataset: PredictItem):
     # ModelService.process_request(mlservice, user_id, data, session)
     data = dataset.model_dump()
-
+    print('Создается request')
 
     message = {'user_id': user_id, 'data': data}
     req_id = str(uuid.uuid4())
@@ -65,9 +65,10 @@ def create_process(user_id: int, dataset: PredictItem):
     channel.start_consuming()
     print('Message send, waiting for response from worker')
     connection.close()
-
-    return {'prediction': "made successfully",
-            'features': data}
+    print("Ответ: ", response)
+    return {'prediction_name': "made successfully",
+            'prediction': response['predict'],
+            'recommendations': response['recommendations']}
 
 @service_route.get("/prediction_history/{user_id}", response_model=List[Prediction])
 def pred_hist(user_id: int, session=Depends(get_session)) -> List[Prediction]:

@@ -131,8 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         const queryString = new URLSearchParams(data).toString();
         console.log('query', queryString)
+        
         // console.log(queryString)
         try {
+            console.log('Отправлен запрос в ml')
             const response = await fetch(`/ml/process_request/${userId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -140,8 +142,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (response.ok) {
-                alert(`Prediction: ${result.prediction}`);
+                alert(`Prediction: ${result.prediction_name}`);
                 fetchHistory();
+                document.getElementById('result-content').innerHTML = ` `
+                document.getElementById('result-content').innerHTML = `
+                    <p><strong>Prediction:</strong> ${result.prediction === 1 ? "Successful" : "Unsuccessful"}</p>
+                    <p><strong>Recommendation:</strong> ${result.recommendations}</p>
+                `
+                // const mlResultTab = new bootstrap.Tab(document.getElementById('result-tab'));
+                // mlResultTab.show();
             } else {
                 alert(result.message);
             }
@@ -152,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function fetchHistory() {
-        const isAdmin = sessionStorage.getItem('isAdmin');
         const userId = sessionStorage.getItem('userId');
         const requestURL = `/ml/prediction_history/${userId}`;
     
@@ -184,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mlTab = document.getElementById('ml-tab');
         // const trTab = document.getElementById('transaction-tab')
         const infoTab = document.getElementById('info-tab')
+        const resultTab = document.getElementById('result-tab')
         // const historyTab = document.getElementById('history-tab')
         const predictionHistoryTab = document.createElement('li');
         predictionHistoryTab.className = 'nav-item';
@@ -194,12 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // balanceTab.style.display = 'block';
             mlTab.style.display = 'block';
             infoTab.style.display = 'block';
+            resultTab.style.display = 'block';
             // Можете добавить здесь аналогичный код для 'Transaction History'
         } else {
             // Обычный пользователь видит вкладки 'ML Request' и 'Profile'
             // balanceTab.style.display = 'none';
             mlTab.style.display = 'block';
             infoTab.style.display = 'block';
+            resultTab.style.display = 'block';
             // Можете добавить здесь вкладку 'Profile', если она требуется
         }
     }
