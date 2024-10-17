@@ -5,9 +5,9 @@ from .base import Base
 class PredictItem(Base):
     project_name: str
     category: str
-    created_date: str  # Можно использовать datetime, если требуется
-    launch_date: str   # То же самое здесь
-    deadline_date: str # И здесь
+    created_date: str  
+    launch_date: str   
+    deadline_date: str 
     goal_amount: float
     staff_pick: int
     num_projects_created: int

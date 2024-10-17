@@ -52,5 +52,3 @@ def show_balance(user_id: int, session=Depends(get_session)) -> dict:
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return {user_id: user.balance}
-    # balance = UserService.get_balance(user_id, session)
-    # return {user_id: balance}

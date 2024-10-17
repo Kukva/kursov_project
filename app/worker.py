@@ -35,11 +35,8 @@ queue_name = 'ML_queue'
 channel.queue_declare(queue=queue_name)
 
 def callback(ch, method, properties, body):
-    # print(body)
     body = json.loads(body)
-    
-    # print(body)
-    # features = pd.DataFrame([body['data'].dict()])
+
     with next(get_session()) as session:
         features, data_prep = serpg.ready_features(data=body['data'],
                                     encoder=encoder, 
@@ -48,10 +45,10 @@ def callback(ch, method, properties, body):
                                     model_name=MODEL_NAME,
                                     train_columns=TRAIN_COLUMNS,
                                     category_mapp=CATEGORY_MAPPINGS)
-        print(features)
-        print("----------------Данные обработаны и отправлены----------------------")
+        # print(features)
+        # print("----------------Данные обработаны и отправлены----------------------")
         process_response = ModelService.process_request(model,features)
-        print("----------------Ответ от модели получен----------------------")
+        # print("----------------Ответ от модели получен----------------------")
         product_analyse = serpg.product_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
         creator_analyse = serpg.creator_analysis(startup_info=data_prep, mode=MODE, model=MODEL_NAME)
         process_response['recommendations'] = serpg.integrate_analyses(product_analyse,
@@ -60,7 +57,7 @@ def callback(ch, method, properties, body):
                                                                        process_response['succ_rate'],
                                                                        mode=MODE,
                                                                        model=MODEL_NAME) 
-        print("----------------Анализ и рекомендации построены----------------------")
+        # print("----------------Анализ и рекомендации построены----------------------")
         ModelService.save_prediction(body['user_id'],
                                      features,
                                      process_response['predict'],
@@ -68,7 +65,7 @@ def callback(ch, method, properties, body):
                                      body['data']['project_name'],
                                      process_response['recommendations'],
                                      session)
-        print("----------------Сохранение рекомендации----------------------")
+        # print("----------------Сохранение рекомендации----------------------")
     # if isinstance(process_response, pd.DataFrame):
     #     process_response = process_response.to_dict(orient='records')
     print(process_response['recommendations'])

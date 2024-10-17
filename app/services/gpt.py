@@ -17,7 +17,6 @@ def get_response(sys_content: str, usr_content: str, model: str):
             {"role": "system", "content": sys_content},
             {"role": "user", "content": usr_content}
         ],
-        # stream=True
     )
     return completion.choices[0].message.content
 

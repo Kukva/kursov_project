@@ -33,18 +33,15 @@ connection_params = pika.ConnectionParameters(
 
 @service_route.post('/process_request/{user_id}', response_model=dict)
 async def create_process(user_id: int, dataset: PredictItem):
-    # ModelService.process_request(mlservice, user_id, data, session)
-    print("Данные с request загружаются")
     data = dataset.model_dump()
-    print('Создается request')
-    
+
     message = {'user_id': user_id, 'data': data}
     req_id = str(uuid.uuid4())
     response_queue = 'response_queue_' + req_id
     connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
     channel.queue_declare(queue=response_queue, exclusive=True)
-    print("Дошло до этого этапа когда канал распознан")
+    
     def on_response(ch, method, properties, body):
         if properties.correlation_id == req_id:
             global response
@@ -65,7 +62,6 @@ async def create_process(user_id: int, dataset: PredictItem):
     channel.start_consuming()
     print('Message send, waiting for response from worker')
     connection.close()
-    print("Ответ: ", response)
     return {'prediction_name': "made successfully",
             'prediction': response['predict'],
             'recommendations': response['recommendations']}

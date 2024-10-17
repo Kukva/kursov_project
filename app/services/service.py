@@ -17,15 +17,10 @@ def load_model(model_path: str):
 def process_request(model, data) -> dict:
     data = pd.DataFrame(data)
     prediction = make_prediction(model, data)
-    # save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], project_name, session)
     return prediction
 
 def make_prediction(model, data):
-    print(f"Дата в таком формате: {data}")
-    print(type(data))
     json_result = data.to_json(orient='records')
-    print(type(json_result))
-    # return data
     predict = model.predict(data)[0].item()
     succ_rate = model.predict_proba(data)[0][1]
     return {'predict': predict,
