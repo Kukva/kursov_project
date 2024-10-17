@@ -1,7 +1,7 @@
 from database.config import get_settings
 from database.database import get_session, init_db, engine
 from sqlmodel import Session
-from models.user import User
+from working_service.kursov_project.app.models.userr import User
 from services.user import create_user, get_all_users
 from services.service import load_model, process_request, make_prediction, save_prediction
 

@@ -1,10 +1,11 @@
+import openai
+import json
+from g4f.client import Client
+import pandas as pd
 from fastapi import HTTPException
 from databases.config import get_settings
 import joblib
-from g4f.client import Client
-import json
-import pandas as pd
-import nest_asyncio
+import asyncio
 
 settings = get_settings()
 
@@ -32,7 +33,6 @@ def process_row(row, sys_content, model):
             # Если ошибка JSON, возвращаем индекс и None
             return None  
     return None 
-
 
 def load_encoder_rf(path):
     """Загружает кодировщик из файла"""
@@ -70,10 +70,11 @@ def preprocess_features(data, category_mean):
     return features
 
 def process_startup_info(data: dict, model_content: str, model_name: str) -> dict:
-    """Обрабатывает описание стартапа и возвращает результат анализа"""
-    startup_info = "Startup Description:" + data['project_description'] + "Founder Information: " + data['creator_description']
+    """Processes the startup description and returns GPT analysis asynchronously."""
+    startup_info = "Startup Description: " + data['project_description'] + " Founder Information: " + data['creator_description']
     json_data = process_row(startup_info, model_content, model_name)
 
+    # Retry until valid response is obtained
     while json_data is None:
         json_data = process_row(startup_info, model_content, model_name)
 
@@ -81,10 +82,11 @@ def process_startup_info(data: dict, model_content: str, model_name: str) -> dic
 
 
 def ready_features(data: dict, encoder, model, category_mean: dict, model_content: str, model_name: str, train_columns: list, category_mapp: dict) -> pd.DataFrame:
-    """Фильтрация данных по параметрам фита модели"""
+    """Filters the data and prepares it for model fitting."""
     json_data = process_startup_info(data, model_content, model_name)
     print("----------------Вызван получение json----------------------")
-    # Обработка данных стартапа
+    
+    # Process startup data
     if 'startup_analysis_responses' in json_data:
         startup_analysis_responses = json_data['startup_analysis_responses']
         json_df = pd.DataFrame([startup_analysis_responses])
@@ -97,8 +99,6 @@ def ready_features(data: dict, encoder, model, category_mean: dict, model_conten
     encoded_data = encoder.transform(json_df)[0]
     combined_df = pd.DataFrame({**dict(zip(json_df.columns, encoded_data)), **preprocess_features(data, category_mean)}, index=[0])
 
-    # Фильтруем колонки
+    # Filter columns
     filtered_dict = {key: combined_df[key] for key in train_columns if key in combined_df}
-    ordered_df = pd.DataFrame([filtered_dict])
-    print("Данные обработаны и получены")
-    return ordered_df
+    return filtered_dict

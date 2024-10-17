@@ -23,11 +23,11 @@ app.mount("/static", StaticFiles(directory="webui"), name="static")
 templates = Jinja2Templates(directory="webui")
 
 @app.get('/')
-async def read_root(request: Request):
+def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get('/favicon.ico', include_in_schema=False)
-async def favicon():
+def favicon():
     return StaticFiles(directory="webui").get_response("favicon.ico")
 
 if __name__ == "__main__":

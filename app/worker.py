@@ -1,14 +1,19 @@
 import pika
-from services import service as ModelService
 import json
 import pandas as pd
 import os
 from dotenv import load_dotenv
 from databases.database import get_session
-from services import service as ModelService
 from databases.database import get_settings
+from routes.config import MODEL_NAME, MODEL_CONTENT_PREPROC, TRAIN_COLUMNS, CATEGORY_MAPPINGS
+from services import service as ModelService
+import services.gpt as serpg
 
 settings = get_settings()
+settings = get_settings()
+encoder = serpg.load_encoder_rf(settings.ENCODER_RF_PATH)
+model = serpg.load_model(settings.MODEL_PATH)
+mean_cat = serpg.load_mean_dict(settings.ENCODED_CATEGORY_PATH)
 
 connection_params = pika.ConnectionParameters(
     host=settings.RABBITMQ_HOST,  # Замените на адрес вашего RabbitMQ сервера
@@ -37,10 +42,22 @@ def callback(ch, method, properties, body):
     # print(body)
     # features = pd.DataFrame([body['data'].dict()])
     with next(get_session()) as session:
+        features = serpg.ready_features(data=body['data'],
+                                    encoder=encoder, 
+                                    model=model,
+                                    category_mean=mean_cat,
+                                    model_content=MODEL_CONTENT_PREPROC,
+                                    model_name=MODEL_NAME,
+                                    train_columns=TRAIN_COLUMNS,
+                                    category_mapp=CATEGORY_MAPPINGS)
+        print(features)
+        print("----------------Данные обработаны и отправлены----------------------")
         process_response = ModelService.process_request(model,
                                                         body['user_id'],
-                                                        body['data'],
+                                                        features,
+                                                        body['data']['project_name'],
                                                         session)
+        print("----------------Ответ от модели получен----------------------")
         # TrService.create_transaction(session, body['user_id'], 10, 'minus')
     response_channel = connection.channel()
     response_channel.basic_publish(

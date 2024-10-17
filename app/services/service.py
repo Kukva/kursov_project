@@ -14,25 +14,32 @@ def load_model(model_path: str):
     return model
 
 
-def process_request(model, user_id: int, data, session):
-    data = pd.DataFrame([data])
-    prediction = make_prediction(model, data)
-    # print(f"made prediction: {prediction}")
-    save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], session)
-    # print(f"saved predictions")
+def process_request(model, user_id: int, data, project_name, session):
+    data = pd.DataFrame(data)
+    prediction = make_prediction(project_name, model, data)
+    save_prediction(user_id, data, prediction['predict'], prediction['succ_rate'], project_name, session)
+    return prediction
 
-def make_prediction(model, data):
+def make_prediction(project_name, model, data):
     # print(data)
     # return data
+    print(data)
+    print(type(data))
     return {'predict': model.predict(data)[0].item(),
-            'succ_rate': model.predict_proba(data)[0].item(),
+            'succ_rate': model.predict_proba(data)[0][1],
             'data': data}
 
 
 def save_prediction(user_id: int, request_data: pd.DataFrame,
-                    prediction, succ_rate, session):
+                    prediction, succ_rate, project_name, session):
+    print(f'user_id: {user_id},\n' \
+      f'request_data: {request_data}, \n' \
+      f'prediction: {prediction}, \n' \
+      f'succ_rate: {succ_rate}, \n')
+    print("Тип:", type(request_data))
     prediction_record = Prediction(
         user_id=user_id,
+        project_name=project_name,
         request_data=request_data.to_json(),
         prediction=prediction,
         pred_rate=succ_rate,

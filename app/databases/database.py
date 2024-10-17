@@ -1,4 +1,7 @@
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import Session, create_engine
+from models.base import Base
+from models.userr import Userr
+from models.prediction import Prediction
 from .config import get_settings
 import subprocess
 
@@ -12,5 +15,5 @@ def get_session():
 
 
 def init_db():
-    SQLModel.metadata.drop_all(engine)
-    SQLModel.metadata.create_all(engine)
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)

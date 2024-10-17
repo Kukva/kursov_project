@@ -28,4 +28,5 @@ requests==2.32.3
 gdown==5.2
 dvc-gdrive==3.0.1
 g4f==0.3.3.0
-nest_asyncio
+asyncio==3.4.3
+openai==1.51.2

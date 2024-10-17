@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Выполняем действия только при успешном ответе
                 loginContainer.classList.add('hidden');
                 dashboardContainer.classList.remove('hidden');
-                // fetchHistory();
-                // startFetchingHistory();
+                fetchHistory();
+                startFetchingHistory();
                 // TransactionHistory();
                 // startFetchingTrans()
                 toggleTabs();
@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             creator_description
         };
         const queryString = new URLSearchParams(data).toString();
+        console.log('query', queryString)
         // console.log(queryString)
         try {
             const response = await fetch(`/ml/process_request/${userId}`, {
@@ -139,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (response.ok) {
-                alert(`Prediction: ${result}`);
-                // fetchHistory();
+                alert(`Prediction: ${result.prediction}`);
+                fetchHistory();
             } else {
                 alert(result.message);
             }
@@ -153,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchHistory() {
         const isAdmin = sessionStorage.getItem('isAdmin');
         const userId = sessionStorage.getItem('userId');
-        const requestURL = isAdmin === "true" ? `/ml/predictions/` : `/ml/prediction_history/${userId}`;
+        const requestURL = `/ml/prediction_history/${userId}`;
     
         try {
             const response = await fetch(requestURL);
@@ -163,9 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             history.forEach(item => {
                 const div = document.createElement('div');
-                const text = isAdmin === "true" ? 
-                    `User ID: ${item.user_id}; Prediction: ${item.prediction}; Credits: ${item.credits_used}; Time: ${item.timestamp}` :
-                    `Prediction: ${item.prediction}; Credits: ${item.credits_used}; Time: ${item.timestamp}`;
+                const text =  `Project name: ${item.project_name}; Prediction: ${item.prediction}; Successful rate: ${item.pred_rate}; Time: ${item.timestamp}`
                 div.innerText = text;
                 historyContainer.appendChild(div);
             });

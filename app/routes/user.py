@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from databases.database import get_session
-from models.user import User
+from models.userr import Userr
 from services import user as UserService
 from typing import List
 
 user_route = APIRouter(tags=['User'])
 
 @user_route.post('/signup')
-async def signup(username: str,password: str,
+def signup(username: str,password: str,
                  email: str, user_type: str,
                  session=Depends(get_session)) -> dict:
     if UserService.get_user_by_email(email, session) is not None:
@@ -24,7 +24,7 @@ async def signup(username: str,password: str,
     }
 
 @user_route.post('/signin')
-async def signin(email: str, password: str, session=Depends(get_session)) -> dict:
+def signin(email: str, password: str, session=Depends(get_session)) -> dict:
     user = UserService.authenticate(email, password, session)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
@@ -33,12 +33,12 @@ async def signin(email: str, password: str, session=Depends(get_session)) -> dic
                 "user_id": user.id,
                 "user_type": user.user_type}
 
-@user_route.get('/all', response_model=List[User])
-async def get_all_users(session=Depends(get_session)) -> list:
+@user_route.get('/all', response_model=List[Userr])
+def get_all_users(session=Depends(get_session)) -> list:
     return UserService.get_all_users(session)
 
-@user_route.get('/users', response_model=List[User])
-async def get_all_users(session=Depends(get_session)) -> list:
+@user_route.get('/users', response_model=List[Userr])
+def get_all_users(session=Depends(get_session)) -> list:
     return UserService.get_all_users(session)
 
 @user_route.post('/add_credits/{user_id}')

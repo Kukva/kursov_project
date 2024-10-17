@@ -324,5 +324,3 @@ cython_debug/
 #.idea/
 /data
 test.py
-# /postgres/data
-# /rabbitmq/data
