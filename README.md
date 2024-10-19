@@ -24,7 +24,7 @@
 ## Загрузка данных
 python -m venv venv  
 venv\Scripts\activate  
-pip install -Ur requirements.txt
+pip install -Ur app/requirements.txt
 
 ## Запуск проекта
 docker-compose up  
