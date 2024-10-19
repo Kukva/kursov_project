@@ -1,0 +1,4 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = C:/ДЗ/Python Projects/FINALPROJECT/data_finale
