@@ -1,19 +1,19 @@
 import requests
 from datetime import datetime
 
-BASE_URL = "http://app:8080"
+BASE_URL = "http://localhost:8080"
 test_data = {
-  "fixed_acidity": 7.4,
-  "volatile_acidity": 0.7,
-  "citric_acid": 0.0,
-  "residual_sugar": 1.9,
-  "chlorides": 0.076,
-  "free_sulfur_dioxide": 11.0,
-  "total_sulfur_dioxide": 34.0,
-  "density": 0.9978,
-  "pH": 3.51,
-  "sulphates": 0.56,
-  "alcohol": 9.4
+    "project_name": "Innovative Smartwatch",
+    "category": "Wearable Technology",
+    "created_date": "2023-06-01",  # Дата создания проекта
+    "launch_date": "2023-06-10",   # Дата запуска кампании
+    "deadline_date": "2023-07-10", # Дата завершения кампании
+    "goal_amount": 50000.00,       # Целевая сумма для сбора
+    "staff_pick": 1,               # Признак выбора командой (0 - нет, 1 - да)
+    "num_projects_created": 2,     # Количество проектов, созданных создателем
+    "num_projects_backed": 5,      # Количество поддержанных создателем проектов
+    "project_description": "A next-generation smartwatch with health monitoring features and seamless integration with other devices.",
+    "creator_description": "A tech enthusiast with a background in developing wearable technology. Previously successfully launched two crowdfunding campaigns."
 }
 
 def test_home_request():
@@ -23,7 +23,7 @@ def test_home_request():
 
 def test_signup():
     response = requests.post(f"{BASE_URL}/user/signup", params={
-    "username": "testuser",
+    "username": "test",
     "password": "password123",
     "email": "testuser@example.com",
     "is_admin": False
@@ -42,13 +42,13 @@ def test_signup_user_exists():
         "username": "testadmin",
         "password": "password1231",
         "email": "testadmin@example.com",
-        "is_admin": True
+        "user_type": "startup"
     })
     response = requests.post(f"{BASE_URL}/user/signup", params={
         "username": "testadmin",
         "password": "password1231",
         "email": "testadmin@example.com",
-        "is_admin": True
+        "user_type": "startup"
     })
     assert response.status_code == 409
     assert response.json() in [
@@ -56,25 +56,6 @@ def test_signup_user_exists():
         {"detail": "User with supplied email exists"}
     ]
 
-def test_add_credits():
-    # Создайте пользователя
-    user_response = requests.post(f"{BASE_URL}/user/signin", params={
-        "password": "password123",
-        "email": "testuser@example.com",
-    })
-    user_id = user_response.json().get('user_id')
-
-    response = requests.post(f"{BASE_URL}/user/add_credits/{user_id}", params={"amount": 100})
-    assert response.status_code == 200
-    assert response.json() == {f"Added to {user_id} user": "100 credits"}
-
-    balance_response = requests.get(f"{BASE_URL}/user/balance/{user_id}")
-    assert balance_response.status_code == 200
-    assert balance_response.json().get(str(user_id)) == 100
-
-def test_show_balance_no_user():
-    response = requests.get(f"{BASE_URL}/user/balance/9999")
-    assert response.status_code == 404
 
 def test_process_request():
     user_response = requests.post(f"{BASE_URL}/user/signin", params={
